@@ -15,6 +15,7 @@ function delaySwitch(log, config) {
     this.name = config['name'];
     this.delay = config['delay'];
     this.disableSensor = config['disableSensor'] || false;
+    this.disableReset = config['disableReset'] || false;
     this.timer;
     this.switchOn = false;
     this.motionTriggered = false;
@@ -64,7 +65,7 @@ delaySwitch.prototype.setOn = function (on, callback) {
         if (!this.disableSensor) this.motionService.getCharacteristic(Characteristic.MotionDetected).updateValue(false);
 
         
-      } else {
+      } else if (!this.switchOn || !this.disableReset) {
         this.log('Starting the Timer.');
         this.switchOn = true;
     
@@ -85,6 +86,8 @@ delaySwitch.prototype.setOn = function (on, callback) {
           }
           
         }.bind(this), this.delay);
+      } else {
+      	this.log('Ignoring repeated On.')
       }
     
       callback();
